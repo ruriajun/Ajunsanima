@@ -384,7 +384,7 @@ async function submitOrder(){
         image_path:filePath,
         animation_style:selectedStyle,
         movement_prompt:prompt,
-        duration:document.getElementById("duration").value,
+        duration:parseInt(document.getElementById("duration").value, 10),
         video_format:document.getElementById("format").value,
         package_name:selectedPackage,
         price:selectedPrice,
