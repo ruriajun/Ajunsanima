@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101018">
+<meta name="description" content="Ubah fotomu menjadi video animasi 10 detik dengan AI Animation Studio.">
+<title>AI Animation Studio - Buat Fotomu Menjadi Gerak</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#101018;
+  --panel:#1c1c29;
+  --purple:#a981f5;
+  --white:#fff;
+  --muted:#aaa6b8;
+  --border:#353345;
+}
+
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:Arial,Helvetica,sans-serif;
+  line-height:1.6;
+}
+
+header{
+  padding:18px 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  background:#101018;
+  z-index:10;
+}
+
+.logo{
+  font-size:19px;
+  font-weight:bold;
+  color:#c3a5ff;
+}
+
+nav a{
+  text-decoration:none;
+  color:#ddd;
+  margin-left:15px;
+  font-size:13px;
+}
+
+.hero{
+  text-align:center;
+  padding:65px 20px 45px;
+  max-width:750px;
+  margin:auto;
+}
+
+.hero h1{
+  font-size:clamp(32px,7vw,52px);
+  line-height:1.2;
+  margin-bottom:18px;
+}
+
+.hero h1 span{color:var(--purple)}
+
+.hero p{
+  color:var(--muted);
+  font-size:15px;
+}
+
+.tag{
+  display:inline-block;
+  color:#d6c0ff;
+  background:#292039;
+  border:1px solid #574276;
+  border-radius:30px;
+  padding:6px 15px;
+  margin-bottom:20px;
+  font-size:12px;
+}
+
+main{
+  max-width:850px;
+  padding:0 18px 50px;
+  margin:auto;
+}
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:23px;
+  margin-bottom:20px;
+}
+
+h2{font-size:20px;margin-bottom:14px}
+
+.step{margin-bottom:27px}
+
+.step-number{
+  color:var(--purple);
+  font-size:12px;
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+label{
+  display:block;
+  margin:12px 0 8px;
+  font-size:14px;
+}
+
+input,textarea,select{
+  width:100%;
+  padding:14px;
+  border:1px solid #454257;
+  background:#11111a;
+  color:white;
+  border-radius:10px;
+  font-size:14px;
+  outline:none;
+}
+
+textarea{min-height:110px;resize:vertical}
+
+input:focus,textarea:focus,select:focus{
+  border-color:var(--purple);
+}
+
+.upload{
+  border:2px dashed #665281;
+  border-radius:13px;
+  padding:30px 15px;
+  text-align:center;
+  background:#171522;
+  cursor:pointer;
+}
+
+.upload input{display:none}
+
+.upload-icon{font-size:35px}
+
+.upload strong{
+  display:block;
+  color:#d3baff;
+  margin-top:7px;
+}
+
+#preview{
+  display:none;
+  width:100%;
+  max-height:300px;
+  object-fit:contain;
+  border-radius:10px;
+  margin-top:15px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:11px;
+}
+
+.style{
+  background:#151520;
+  border:1px solid #414052;
+  padding:17px 8px;
+  border-radius:11px;
+  text-align:center;
+  cursor:pointer;
+  color:white;
+}
+
+.style.active{
+  border:2px solid var(--purple);
+  background:#30233f;
+}
+
+.style .emoji{font-size:25px;display:block}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:14px;
+  background:var(--purple);
+  color:#171020;
+  font-weight:bold;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.btn-full{width:100%;margin-top:12px}
+
+.btn-secondary{
+  background:#393149;
+  color:white;
+  width:100%;
+  margin-top:10px;
+}
+
+.note{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:10px;
+}
+
+.price-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.price-card{
+  background:#171522;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:17px;
+}
+
+.price-card h3{margin-bottom:7px}
+
+.price{
+  font-size:23px;
+  font-weight:bold;
+  color:#c3a5ff;
+}
+
+.price-card p{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:8px;
+}
+
+.popular{border-color:var(--purple)}
+
+footer{
+  text-align:center;
+  padding:30px 15px;
+  color:#888;
+  border-top:1px solid var(--border);
+  font-size:12px;
+}
+
+#status{
+  margin-top:15px;
+  color:#d4baff;
+  font-size:13px;
+}
+
+@media(min-width:650px){
+  .grid{grid-template-columns:repeat(4,1fr)}
+  .price-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">✦ AI Animation Studio</div>
+  <nav>
+    <a href="#studio">Studio</a>
+    <a href="#paket">Paket</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="tag">✨ Ubah Imajinasi Menjadi Animasi</div>
+  <h1>Buat Fotomu <span>Menjadi Gerak</span></h1>
+  <p>
+    Satu foto bisa menjadi cerita yang menarik.
+    Ubah fotomu menjadi video animasi berdurasi 10 detik.
+    Mudah, kreatif, dan seru!
+  </p>
+</section>
+
+<main>
+
+<section class="panel" id="studio">
+
+  <h2>🎬 Mulai Kreasimu</h2>
+
+  <div class="step">
+    <div class="step-number">LANGKAH 01</div>
+    <label>Unggah foto yang ingin dianimasikan</label>
+
+    <label class="upload" for="image">
+      <span class="upload-icon">📸</span>
+      <strong>Ketuk untuk pilih foto</strong>
+      <small style="color:#aaa">JPG, PNG, atau WEBP</small>
+      <input type="file" id="image" accept="image/jpeg,image/png,image/webp">
+    </label>
+
+    <img id="preview" alt="Pratinjau foto">
+  </div>
+
+  <div class="step">
+    <div class="step-number">LANGKAH 02</div>
+    <h2>Pilih gaya animasi</h2>
+
+    <div class="grid" id="styles">
+
+      <div class="style active" data-style="Clay Animation">
+        <span class="emoji">🧸</span>
+        Clay Animation
+      </div>
+
+      <div class="style" data-style="3D Cartoon">
+        <span class="emoji">🎭</span>
+        Kartun 3D
+      </div>
+
+      <div class="style" data-style="Anime">
+        <span class="emoji">🌸</span>
+        Anime
+      </div>
+
+      <div class="style" data-style="Realistic">
+        <span class="emoji">🎬</span>
+        Realistis
+      </div>
+
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-number">LANGKAH 03</div>
+    <h2>Tentukan gerakan</h2>
+
+    <label for="prompt">Apa yang ingin dilakukan karakter?</label>
+
+    <textarea id="prompt"
+      placeholder="Contoh: Dua orang saling tersenyum, kemudian berjalan bersama sambil bergandengan tangan."></textarea>
+
+    <button class="btn btn-secondary" onclick="makeTemplate()">
+      ✨ Buat Prompt Otomatis
+    </button>
+
+    <button class="btn btn-secondary" onclick="aiAssistant()">
+      🤖 Asisten Prompt AI
+    </button>
+
+    <p class="note">
+      Prompt otomatis menggunakan template gratis.
+      Asisten Prompt AI akan memerlukan integrasi layanan AI
+      dan dapat dikenakan biaya tambahan.
+    </p>
+  </div>
+
+  <div class="step">
+    <div class="step-number">LANGKAH 04</div>
+    <h2>Pengaturan video</h2>
+
+    <label>Durasi video</label>
+    <select id="duration">
+      <option value="10 detik">10 detik</option>
+    </select>
+
+    <label>Format video</label>
+    <select id="format">
+      <option value="9:16">Vertikal (9:16)</option>
+      <option value="16:9">Horizontal (16:9)</option>
+      <option value="1:1">Kotak (1:1)</option>
+    </select>
+
+    <button class="btn btn-full" onclick="submitOrder()">
+      Lanjutkan Pemesanan →
+    </button>
+
+    <div id="status"></div>
+
+  </div>
+</section>
+
+<section class="panel" id="paket">
+  <h2>💜 Pilihan Paket</h2>
+
+  <div class="price-grid">
+
+    <div class="price-card">
+      <h3>Basic</h3>
+      <div class="price">Rp35.000</div>
+      <p>Video animasi 10 detik.</p>
+      <p>Prompt manual.</p>
+      <p>Template prompt gratis.</p>
+    </div>
+
+    <div class="price-card popular">
+      <h3>Basic + AI</h3>
+      <div class="price">Rp45.000</div>
+      <p>Video animasi 10 detik.</p>
+      <p>Prompt manual.</p>
+      <p>Bantuan AI membuat prompt.</p>
+    </div>
+
+    <div class="price-card">
+      <h3>Premium</h3>
+      <div class="price">Rp55.000</div>
+      <p>Video animasi 10 detik.</p>
+      <p>AI Prompt Assistant.</p>
+      <p>Arahan gerakan dan kamera lebih detail.</p>
+    </div>
+
+  </div>
+
+  <p class="note">
+    Harga di atas masih simulasi dan dapat disesuaikan.
+    Biaya tambahan akan diinformasikan sebelum pemesanan.
+  </p>
+</section>
+
+</main>
+
+<footer>
+  <p>✦ AI Animation Studio</p>
+  <p>Buat Fotomu Menjadi Gerak.</p>
+  <p style="margin-top:8px">© 2026 AI Animation Studio</p>
+</footer>
+
+<script>
+let selectedStyle="Clay Animation";
+
+document.querySelectorAll(".style").forEach(item=>{
+  item.addEventListener("click",()=>{
+    document.querySelectorAll(".style").forEach(x=>{
+      x.classList.remove("active");
+    });
+
+    item.classList.add("active");
+    selectedStyle=item.dataset.style;
+  });
+});
+
+document.getElementById("image").addEventListener("change",event=>{
+  const file=event.target.files[0];
+
+  if(!file)return;
+
+  if(file.size>10*1024*1024){
+    alert("Ukuran foto maksimal 10 MB.");
+    event.target.value="";
+    return;
+  }
+
+  const preview=document.getElementById("preview");
+  preview.src=URL.createObjectURL(file);
+  preview.style.display="block";
+});
+
+function makeTemplate(){
+  const text=
+  "Animasikan foto ini dengan gaya "+selectedStyle+
+  ". Pertahankan wajah, identitas, pakaian, dan ciri khas karakter. "+
+  "Buat gerakan tubuh yang alami, ekspresi wajah yang hidup, "+
+  "gerakan kamera sinematik, dan animasi yang halus. "+
+  "Durasi 10 detik. No dialogue, no voice-over, no subtitles, no text on screen.";
+
+  document.getElementById("prompt").value=text;
+}
+
+function aiAssistant(){
+  alert(
+    "Asisten Prompt AI akan segera hadir. "+
+    "Fitur ini memerlukan integrasi API AI dan akan tersedia sesuai paket layanan."
+  );
+}
+
+function submitOrder(){
+  const file=document.getElementById("image").files[0];
+  const prompt=document.getElementById("prompt").value.trim();
+
+  if(!file){
+    alert("Silakan unggah foto terlebih dahulu.");
+    return;
+  }
+
+  if(!prompt){
+    alert("Silakan isi instruksi gerakan terlebih dahulu.");
+    return;
+  }
+
+  document.getElementById("status").textContent=
+    "Berhasil! Foto dan instruksi sudah siap. "+
+    "Sistem pemesanan dan produksi video akan dihubungkan pada tahap berikutnya.";
+
+  document.getElementById("status").scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+}
+</script>
+
+</body>
+</html>
