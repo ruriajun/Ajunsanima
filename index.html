@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101018">
 <title>AI Animation Studio</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -19,71 +18,112 @@
 }
 *{box-sizing:border-box}
 body{
-  margin:0;background:var(--bg);color:var(--white);
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
   font-family:Arial,sans-serif;
 }
 header{
-  padding:18px;text-align:center;
+  padding:18px;
+  text-align:center;
   border-bottom:1px solid #302b3c;
-  font-size:21px;font-weight:bold;
+  font-size:21px;
+  font-weight:bold;
 }
 header span{color:var(--purple)}
 main{max-width:600px;margin:auto;padding:16px}
 h2{font-size:25px;text-align:center;margin:25px 0 8px}
 .sub{text-align:center;color:var(--muted);font-size:14px;line-height:1.6}
 .panel{
-  background:var(--panel);border:1px solid #343044;
-  border-radius:15px;padding:17px;margin:17px 0;
+  background:var(--panel);
+  border:1px solid #343044;
+  border-radius:15px;
+  padding:17px;
+  margin:17px 0;
 }
 h3{font-size:17px;margin:0 0 15px}
 .small-title{font-size:11px;color:var(--purple);margin:18px 0 9px}
 .upload{
-  display:block;text-align:center;padding:25px 12px;
-  border:2px dashed #71618d;border-radius:12px;
-  cursor:pointer;color:#ddd;
+  display:block;
+  text-align:center;
+  padding:25px 12px;
+  border:2px dashed #71618d;
+  border-radius:12px;
+  cursor:pointer;
+  color:#ddd;
 }
 .upload input{display:none}
 #preview{
-  display:none;width:100%;max-height:300px;
-  object-fit:contain;margin-top:15px;border-radius:10px;
+  display:none;
+  width:100%;
+  max-height:300px;
+  object-fit:contain;
+  margin-top:15px;
+  border-radius:10px;
 }
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .choice{
-  background:#11111b;color:white;border:1px solid #40384f;
-  border-radius:11px;padding:16px 8px;
-  cursor:pointer;text-align:center;font-size:14px;
+  background:#11111b;
+  color:white;
+  border:1px solid #40384f;
+  border-radius:11px;
+  padding:16px 8px;
+  cursor:pointer;
+  text-align:center;
+  font-size:14px;
 }
 .choice.active{
   border:2px solid var(--purple);
   background:#292039;
 }
-.choice strong{display:block;color:var(--purple);margin-top:8px}
+.choice strong{
+  display:block;
+  color:var(--purple);
+  margin-top:8px;
+}
 input,textarea,select{
-  width:100%;padding:13px;border-radius:9px;
-  background:#11111b;color:white;
-  border:1px solid #484052;font-size:14px;
+  width:100%;
+  padding:13px;
+  border-radius:9px;
+  background:#11111b;
+  color:white;
+  border:1px solid #484052;
+  font-size:14px;
 }
 textarea{min-height:105px;resize:vertical}
-button{
-  cursor:pointer;font-size:14px;
-}
+button{cursor:pointer;font-size:14px}
 .primary{
-  width:100%;padding:14px;border:0;border-radius:10px;
-  background:var(--purple);color:#160e22;
-  font-weight:bold;margin-top:13px;
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  background:var(--purple);
+  color:#160e22;
+  font-weight:bold;
+  margin-top:13px;
 }
 .secondary{
-  width:100%;padding:12px;border:1px solid #55466c;
-  border-radius:9px;background:#292039;color:white;
+  width:100%;
+  padding:12px;
+  border:1px solid #55466c;
+  border-radius:9px;
+  background:#292039;
+  color:white;
   margin-top:9px;
 }
 .note{font-size:12px;color:var(--muted);line-height:1.6}
-#status{
-  padding:12px;border-radius:9px;margin-top:15px;
-  font-size:13px;line-height:1.5;display:none;
+#status,#orderStatus{
+  padding:12px;
+  border-radius:9px;
+  margin-top:15px;
+  font-size:13px;
+  line-height:1.5;
+  display:none;
 }
 footer{
-  text-align:center;color:#777;font-size:12px;
+  text-align:center;
+  color:#777;
+  font-size:12px;
   padding:30px 10px;
 }
 </style>
@@ -137,6 +177,7 @@ Ketuk untuk pilih foto<br>
 </select>
 
 <br><br>
+
 <label class="note">Format video</label>
 <select id="format">
 <option value="9:16">Vertikal 9:16</option>
@@ -209,10 +250,7 @@ AI Animation Studio<br>
 </footer>
 
 <script>
-// ======================================
 // KONFIGURASI SUPABASE
-// Masukkan URL dan Publishable Key milikmu
-// ======================================
 
 const SUPABASE_URL = "https://mztxuswyhoowdsnxewbv.supabase.co";
 const SUPABASE_KEY = "sb_publishable_DnsDQsbJ4PJV1EirlcaaCg_SVYbNuZS";
@@ -230,9 +268,7 @@ if(
   );
 }
 
-// ======================================
 // PILIHAN ANIMASI DAN PAKET
-// ======================================
 
 let selectedStyle = "Clay Animation";
 let selectedPackage = "Basic";
@@ -242,6 +278,7 @@ document.querySelectorAll("#styles .choice").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll("#styles .choice")
       .forEach(b=>b.classList.remove("active"));
+
     btn.classList.add("active");
     selectedStyle = btn.dataset.value;
   });
@@ -251,15 +288,14 @@ document.querySelectorAll("#packages .choice").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.querySelectorAll("#packages .choice")
       .forEach(b=>b.classList.remove("active"));
+
     btn.classList.add("active");
     selectedPackage = btn.dataset.package;
     selectedPrice = Number(btn.dataset.price);
   });
 });
 
-// ======================================
 // PREVIEW FOTO
-// ======================================
 
 const imageInput = document.getElementById("image");
 const preview = document.getElementById("preview");
@@ -285,9 +321,7 @@ imageInput.addEventListener("change",()=>{
   preview.style.display = "block";
 });
 
-// ======================================
 // LANJUT PEMESANAN
-// ======================================
 
 document.getElementById("continueBtn").addEventListener("click",()=>{
   const file = imageInput.files[0];
@@ -308,11 +342,7 @@ document.getElementById("continueBtn").addEventListener("click",()=>{
   });
 });
 
-// ======================================
 // KIRIM PESANAN KE SUPABASE
-// Memerlukan tabel orders dan bucket
-// order-photos yang sudah disiapkan.
-// ======================================
 
 document.getElementById("submitBtn").addEventListener("click",submitOrder);
 
@@ -355,6 +385,7 @@ async function submitOrder(){
   try{
 
     const extension = file.name.split(".").pop().toLowerCase();
+
     const safeExtension = ["jpg","jpeg","png","webp"].includes(extension)
       ? extension : "jpg";
 
@@ -375,6 +406,11 @@ async function submitOrder(){
 
     status.textContent = "Foto berhasil diunggah. Menyimpan pesanan...";
 
+    const durationValue = parseInt(
+      document.getElementById("duration").value,
+      10
+    );
+
     const {error:insertError} = await db
       .from("orders")
       .insert({
@@ -384,11 +420,11 @@ async function submitOrder(){
         image_path:filePath,
         animation_style:selectedStyle,
         movement_prompt:prompt,
-        duration:parseInt(document.getElementById("duration").value, 10),
+        duration:durationValue,
         video_format:document.getElementById("format").value,
         package_name:selectedPackage,
         price:selectedPrice,
-        status:"pending"
+        status:"Menunggu"
       });
 
     if(insertError) throw insertError;
@@ -415,3 +451,4 @@ async function submitOrder(){
 
 </body>
 </html>
+
