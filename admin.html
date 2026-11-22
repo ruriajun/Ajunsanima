@@ -1,0 +1,272 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Animation Studio - Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font-family: Arial, sans-serif;
+      background: #10101c; color: #fff;
+    }
+    .container { max-width: 1100px; margin: auto; }
+    .panel {
+      background: #1c1c30; padding: 22px;
+      border-radius: 14px; margin-bottom: 20px;
+    }
+    h1, h2 { color: #c5a5ff; }
+    input, select, button {
+      padding: 12px; margin: 6px 0;
+      border-radius: 8px; border: 1px solid #444;
+      font-size: 15px;
+    }
+    input, select {
+      background: #292941; color: white; width: 100%;
+    }
+    button {
+      background: #8054df; color: white;
+      border: 0; cursor: pointer;
+    }
+    button:hover { background: #6840bd; }
+    .danger { background: #a33b50; }
+    .hidden { display: none; }
+    .order, .package {
+      background: #292941; padding: 15px;
+      border-radius: 10px; margin: 12px 0;
+    }
+    .muted { color: #aaa; font-size: 13px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media(max-width:600px) {
+      body { padding: 12px; }
+      .row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>AI Animation Studio</h1>
+  <p>Admin Dashboard</p>
+
+  <section id="loginPanel" class="panel">
+    <h2>Login Admin</h2>
+    <input id="email" type="email" placeholder="Email admin">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="loginMessage" class="muted"></p>
+  </section>
+
+  <main id="dashboard" class="hidden">
+    <div class="panel">
+      <h2>Dashboard</h2>
+      <p id="adminEmail"></p>
+      <button onclick="loadOrders()">Muat Ulang Pesanan</button>
+      <button onclick="loadPackages()">Muat Ulang Harga</button>
+      <button class="danger" onclick="logout()">Logout</button>
+    </div>
+
+    <section class="panel">
+      <h2>Daftar Pesanan</h2>
+      <div id="orders">Memuat pesanan...</div>
+    </section>
+
+    <section class="panel">
+      <h2>Kelola Harga Paket</h2>
+      <div id="packages">Memuat paket...</div>
+      <h3>Tambah Paket</h3>
+      <input id="newPackageName" placeholder="Nama paket">
+      <input id="newPackagePrice" type="number" placeholder="Harga (contoh: 15000)">
+      <button onclick="addPackage()">Tambah Paket</button>
+      <p id="packageMessage" class="muted"></p>
+    </section>
+  </main>
+</div>
+
+<script>
+const SUPABASE_URL = "https://mztxuswyhoowdsnxewbv.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_DnsDQsbJ4PJV1EirlcaaCg_SVYbNuZS";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const ADMIN_UID = "a341ed34-917b-4c04-ae89-83f418a5fa54";
+
+async function login() {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const message = document.getElementById("loginMessage");
+
+  const { data, error } = await db.auth.signInWithPassword({
+    email, password
+  });
+
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
+
+  if (data.user.id !== ADMIN_UID) {
+    await db.auth.signOut();
+    message.textContent = "Akun ini bukan admin.";
+    return;
+  }
+
+  showDashboard(data.user);
+}
+
+function showDashboard(user) {
+  document.getElementById("loginPanel").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("adminEmail").textContent = user.email;
+  loadOrders();
+  loadPackages();
+}
+
+async function logout() {
+  await db.auth.signOut();
+  location.reload();
+}
+
+async function checkSession() {
+  const { data } = await db.auth.getUser();
+  if (data.user) {
+    if (data.user.id === ADMIN_UID) showDashboard(data.user);
+    else await db.auth.signOut();
+  }
+}
+
+async function loadOrders() {
+  const box = document.getElementById("orders");
+  box.textContent = "Memuat...";
+
+  const { data, error } = await db
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    box.textContent = "Gagal memuat pesanan: " + error.message;
+    return;
+  }
+
+  if (!data.length) {
+    box.textContent = "Belum ada pesanan.";
+    return;
+  }
+
+  box.innerHTML = data.map(order => `
+    <div class="order">
+      <strong>${escapeHTML(order.customer_name)}</strong>
+      <p>WhatsApp: ${escapeHTML(order.phone)}</p>
+      <p>Paket: ${escapeHTML(order.package_name)}</p>
+      <p>Harga: ${Number(order.price).toLocaleString("id-ID")}</p>
+      <p>Gaya: ${escapeHTML(order.animation_style)}</p>
+      <p>Durasi: ${order.duration} detik</p>
+      <p>Format: ${escapeHTML(order.video_format)}</p>
+      <p>Status: ${escapeHTML(order.status)}</p>
+      <p class="muted">${escapeHTML(order.created_at)}</p>
+      <select id="status-${order.id}">
+        ${["Menunggu","Diproses","Selesai","Dibatalkan"].map(s =>
+          `<option value="${s}" ${s === order.status ? "selected" : ""}>${s}</option>`
+        ).join("")}
+      </select>
+      <button onclick="updateStatus('${order.id}')">Simpan Status</button>
+    </div>
+  `).join("");
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;",
+    '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+async function updateStatus(id) {
+  const status = document.getElementById("status-" + id).value;
+  const { error } = await db.from("orders")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) alert("Gagal: " + error.message);
+  else {
+    alert("Status pesanan diperbarui.");
+    loadOrders();
+  }
+}
+
+async function loadPackages() {
+  const box = document.getElementById("packages");
+  box.textContent = "Memuat...";
+
+  const { data, error } = await db
+    .from("paket_harga").select("*").order("id");
+
+  if (error) {
+    box.textContent = "Gagal memuat paket: " + error.message;
+    return;
+  }
+
+  box.innerHTML = data.map(p => `
+    <div class="package">
+      <strong>${escapeHTML(p.nama_paket)}</strong>
+      <p>Harga saat ini: Rp ${Number(p.harga).toLocaleString("id-ID")}</p>
+      <input id="price-${p.id}" type="number" value="${p.harga}">
+      <button onclick="updatePrice('${p.id}')">Ubah Harga</button>
+    </div>
+  `).join("");
+}
+
+async function updatePrice(id) {
+  const harga = Number(document.getElementById("price-" + id).value);
+  if (!Number.isSafeInteger(harga) || harga < 0) {
+    alert("Masukkan harga yang valid.");
+    return;
+  }
+
+  const { error } = await db.from("paket_harga")
+    .update({ harga, updated_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) alert("Gagal: " + error.message);
+  else {
+    alert("Harga berhasil diperbarui.");
+    loadPackages();
+  }
+}
+
+async function addPackage() {
+  const nama_paket = document.getElementById("newPackageName").value.trim();
+  const harga = Number(document.getElementById("newPackagePrice").value);
+
+  if (!nama_paket || !Number.isSafeInteger(harga) || harga < 0) {
+    alert("Lengkapi nama dan harga paket.");
+    return;
+  }
+
+  const { error } = await db.from("paket_harga")
+    .insert({ nama_paket, harga });
+
+  if (error) {
+    document.getElementById("packageMessage").textContent = error.message;
+  } else {
+    document.getElementById("packageMessage").textContent = "Paket berhasil ditambahkan.";
+    document.getElementById("newPackageName").value = "";
+    document.getElementById("newPackagePrice").value = "";
+    loadPackages();
+  }
+}
+
+db.auth.onAuthStateChange((event, session) => {
+  if (event === "SIGNED_OUT") location.reload();
+});
+
+checkSession();
+</script>
+</body>
+</html>
