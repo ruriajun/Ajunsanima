@@ -3,477 +3,297 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#101018">
-<meta name="description" content="Ubah fotomu menjadi video animasi 10 detik dengan AI Animation Studio.">
-<title>AI Animation Studio - Buat Fotomu Menjadi Gerak</title>
+<title>AI Animation Studio</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-
 :root{
   --bg:#101018;
   --panel:#1c1c29;
   --purple:#a981f5;
   --white:#fff;
-  --muted:#aaa6b8;
-  --border:#353345;
+  --muted:#aaa5b8;
 }
-
+*{box-sizing:border-box}
 body{
-  background:var(--bg);
-  color:var(--white);
-  font-family:Arial,Helvetica,sans-serif;
-  line-height:1.6;
+  margin:0;background:var(--bg);color:var(--white);
+  font-family:Arial,sans-serif;
 }
-
 header{
-  padding:18px 6%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  background:#101018;
-  z-index:10;
+  padding:18px;text-align:center;
+  border-bottom:1px solid #302b3c;
+  font-size:21px;font-weight:bold;
 }
-
-.logo{
-  font-size:19px;
-  font-weight:bold;
-  color:#c3a5ff;
-}
-
-nav a{
-  text-decoration:none;
-  color:#ddd;
-  margin-left:15px;
-  font-size:13px;
-}
-
-.hero{
-  text-align:center;
-  padding:65px 20px 45px;
-  max-width:750px;
-  margin:auto;
-}
-
-.hero h1{
-  font-size:clamp(32px,7vw,52px);
-  line-height:1.2;
-  margin-bottom:18px;
-}
-
-.hero h1 span{color:var(--purple)}
-
-.hero p{
-  color:var(--muted);
-  font-size:15px;
-}
-
-.tag{
-  display:inline-block;
-  color:#d6c0ff;
-  background:#292039;
-  border:1px solid #574276;
-  border-radius:30px;
-  padding:6px 15px;
-  margin-bottom:20px;
-  font-size:12px;
-}
-
-main{
-  max-width:850px;
-  padding:0 18px 50px;
-  margin:auto;
-}
-
+header span{color:var(--purple)}
+main{max-width:600px;margin:auto;padding:16px}
+h2{font-size:25px;text-align:center;margin:25px 0 8px}
+.sub{text-align:center;color:var(--muted);font-size:14px;line-height:1.6}
 .panel{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:23px;
-  margin-bottom:20px;
+  background:var(--panel);border:1px solid #343044;
+  border-radius:15px;padding:17px;margin:17px 0;
 }
-
-h2{font-size:20px;margin-bottom:14px}
-
-.step{margin-bottom:27px}
-
-.step-number{
-  color:var(--purple);
-  font-size:12px;
-  font-weight:bold;
-  margin-bottom:5px;
-}
-
-label{
-  display:block;
-  margin:12px 0 8px;
-  font-size:14px;
-}
-
-input,textarea,select{
-  width:100%;
-  padding:14px;
-  border:1px solid #454257;
-  background:#11111a;
-  color:white;
-  border-radius:10px;
-  font-size:14px;
-  outline:none;
-}
-
-textarea{min-height:110px;resize:vertical}
-
-input:focus,textarea:focus,select:focus{
-  border-color:var(--purple);
-}
-
+h3{font-size:17px;margin:0 0 15px}
+.small-title{font-size:11px;color:var(--purple);margin:18px 0 9px}
 .upload{
-  border:2px dashed #665281;
-  border-radius:13px;
-  padding:30px 15px;
-  text-align:center;
-  background:#171522;
-  cursor:pointer;
+  display:block;text-align:center;padding:25px 12px;
+  border:2px dashed #71618d;border-radius:12px;
+  cursor:pointer;color:#ddd;
 }
-
 .upload input{display:none}
-
-.upload-icon{font-size:35px}
-
-.upload strong{
-  display:block;
-  color:#d3baff;
-  margin-top:7px;
-}
-
 #preview{
-  display:none;
-  width:100%;
-  max-height:300px;
-  object-fit:contain;
-  border-radius:10px;
-  margin-top:15px;
+  display:none;width:100%;max-height:300px;
+  object-fit:contain;margin-top:15px;border-radius:10px;
 }
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:11px;
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{
+  background:#11111b;color:white;border:1px solid #40384f;
+  border-radius:11px;padding:16px 8px;
+  cursor:pointer;text-align:center;font-size:14px;
 }
-
-.style{
-  background:#151520;
-  border:1px solid #414052;
-  padding:17px 8px;
-  border-radius:11px;
-  text-align:center;
-  cursor:pointer;
-  color:white;
-}
-
-.style.active{
+.choice.active{
   border:2px solid var(--purple);
-  background:#30233f;
+  background:#292039;
 }
-
-.style .emoji{font-size:25px;display:block}
-
-.btn{
-  border:0;
-  border-radius:10px;
-  padding:14px;
-  background:var(--purple);
-  color:#171020;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:14px;
+.choice strong{display:block;color:var(--purple);margin-top:8px}
+input,textarea,select{
+  width:100%;padding:13px;border-radius:9px;
+  background:#11111b;color:white;
+  border:1px solid #484052;font-size:14px;
 }
-
-.btn:disabled{opacity:.5;cursor:not-allowed}
-
-.btn-full{width:100%;margin-top:12px}
-
-.btn-secondary{
-  background:#393149;
-  color:white;
-  width:100%;
-  margin-top:10px;
+textarea{min-height:105px;resize:vertical}
+button{
+  cursor:pointer;font-size:14px;
 }
-
-.note{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:10px;
+.primary{
+  width:100%;padding:14px;border:0;border-radius:10px;
+  background:var(--purple);color:#160e22;
+  font-weight:bold;margin-top:13px;
 }
-
-.price-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
+.secondary{
+  width:100%;padding:12px;border:1px solid #55466c;
+  border-radius:9px;background:#292039;color:white;
+  margin-top:9px;
 }
-
-.price-card{
-  background:#171522;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:17px;
-}
-
-.price-card h3{margin-bottom:7px}
-
-.price{
-  font-size:23px;
-  font-weight:bold;
-  color:#c3a5ff;
-}
-
-.price-card p{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:8px;
-}
-
-.popular{border-color:var(--purple)}
-
-footer{
-  text-align:center;
-  padding:30px 15px;
-  color:#888;
-  border-top:1px solid var(--border);
-  font-size:12px;
-}
-
+.note{font-size:12px;color:var(--muted);line-height:1.6}
 #status{
-  margin-top:15px;
-  color:#d4baff;
-  font-size:13px;
+  padding:12px;border-radius:9px;margin-top:15px;
+  font-size:13px;line-height:1.5;display:none;
 }
-
-@media(min-width:650px){
-  .grid{grid-template-columns:repeat(4,1fr)}
-  .price-grid{grid-template-columns:repeat(3,1fr)}
+footer{
+  text-align:center;color:#777;font-size:12px;
+  padding:30px 10px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">✦ AI Animation Studio</div>
-  <nav>
-    <a href="#studio">Studio</a>
-    <a href="#paket">Paket</a>
-  </nav>
-</header>
-
-<section class="hero">
-  <div class="tag">✨ Ubah Imajinasi Menjadi Animasi</div>
-  <h1>Buat Fotomu <span>Menjadi Gerak</span></h1>
-  <p>
-    Satu foto bisa menjadi cerita yang menarik.
-    Ubah fotomu menjadi video animasi berdurasi 10 detik.
-    Mudah, kreatif, dan seru!
-  </p>
-</section>
+<header>✨ AI Animation <span>Studio</span></header>
 
 <main>
 
-<section class="panel" id="studio">
+<h2>Buat Fotomu Menjadi <span style="color:#b28afa">Gerak</span></h2>
+<p class="sub">
+Ubah foto menjadi video animasi menggunakan teknologi AI.
+Pilih gaya, tentukan gerakan, dan mulai kreasimu.
+</p>
 
-  <h2>🎬 Mulai Kreasimu</h2>
+<section class="panel">
+<h3>🎬 Mulai Kreasimu</h3>
 
-  <div class="step">
-    <div class="step-number">LANGKAH 01</div>
-    <label>Unggah foto yang ingin dianimasikan</label>
+<div class="small-title">LANGKAH 1 — UNGGAH FOTO</div>
 
-    <label class="upload" for="image">
-      <span class="upload-icon">📸</span>
-      <strong>Ketuk untuk pilih foto</strong>
-      <small style="color:#aaa">JPG, PNG, atau WEBP</small>
-      <input type="file" id="image" accept="image/jpeg,image/png,image/webp">
-    </label>
+<label class="upload">
+📸<br><br>
+Ketuk untuk pilih foto<br>
+<span class="note">Format JPG, PNG atau WEBP</span>
+<input id="image" type="file" accept="image/jpeg,image/png,image/webp">
+</label>
 
-    <img id="preview" alt="Pratinjau foto">
-  </div>
+<img id="preview" alt="Preview foto">
 
-  <div class="step">
-    <div class="step-number">LANGKAH 02</div>
-    <h2>Pilih gaya animasi</h2>
+<div class="small-title">LANGKAH 2 — PILIH GAYA ANIMASI</div>
 
-    <div class="grid" id="styles">
+<div class="grid" id="styles">
+<button type="button" class="choice active" data-value="Clay Animation">🧸<br>Clay Animation</button>
+<button type="button" class="choice" data-value="Kartun 3D">🎭<br>Kartun 3D</button>
+<button type="button" class="choice" data-value="Anime">🌸<br>Anime</button>
+<button type="button" class="choice" data-value="Film Realistis">🎬<br>Film Realistis</button>
+</div>
 
-      <div class="style active" data-style="Clay Animation">
-        <span class="emoji">🧸</span>
-        Clay Animation
-      </div>
+<div class="small-title">LANGKAH 3 — TENTUKAN GERAKAN</div>
 
-      <div class="style" data-style="3D Cartoon">
-        <span class="emoji">🎭</span>
-        Kartun 3D
-      </div>
+<textarea id="prompt" placeholder="Contoh: Karakter berjalan perlahan, tersenyum, lalu melambaikan tangan."></textarea>
 
-      <div class="style" data-style="Anime">
-        <span class="emoji">🌸</span>
-        Anime
-      </div>
+<div class="small-title">LANGKAH 4 — PENGATURAN VIDEO</div>
 
-      <div class="style" data-style="Realistic">
-        <span class="emoji">🎬</span>
-        Realistis
-      </div>
+<label class="note">Durasi video</label>
+<select id="duration">
+<option value="5 detik">5 detik</option>
+<option value="10 detik">10 detik</option>
+<option value="15 detik">15 detik</option>
+<option value="30 detik">30 detik</option>
+</select>
 
-    </div>
-  </div>
+<br><br>
+<label class="note">Format video</label>
+<select id="format">
+<option value="9:16">Vertikal 9:16</option>
+<option value="16:9">Horizontal 16:9</option>
+<option value="1:1">Kotak 1:1</option>
+</select>
 
-  <div class="step">
-    <div class="step-number">LANGKAH 03</div>
-    <h2>Tentukan gerakan</h2>
+<button class="primary" id="continueBtn" type="button">
+Lanjutkan Pemesanan →
+</button>
 
-    <label for="prompt">Apa yang ingin dilakukan karakter?</label>
-
-    <textarea id="prompt"
-      placeholder="Contoh: Dua orang saling tersenyum, kemudian berjalan bersama sambil bergandengan tangan."></textarea>
-
-    <button class="btn btn-secondary" onclick="makeTemplate()">
-      ✨ Buat Prompt Otomatis
-    </button>
-
-    <button class="btn btn-secondary" onclick="aiAssistant()">
-      🤖 Asisten Prompt AI
-    </button>
-
-    <p class="note">
-      Prompt otomatis menggunakan template gratis.
-      Asisten Prompt AI akan memerlukan integrasi layanan AI
-      dan dapat dikenakan biaya tambahan.
-    </p>
-  </div>
-
-  <div class="step">
-    <div class="step-number">LANGKAH 04</div>
-    <h2>Pengaturan video</h2>
-
-    <label>Durasi video</label>
-    <select id="duration">
-      <option value="10 detik">10 detik</option>
-    </select>
-
-    <label>Format video</label>
-    <select id="format">
-      <option value="9:16">Vertikal (9:16)</option>
-      <option value="16:9">Horizontal (16:9)</option>
-      <option value="1:1">Kotak (1:1)</option>
-    </select>
-
-    <button class="btn btn-full" onclick="submitOrder()">
-      Lanjutkan Pemesanan →
-    </button>
-
-    <div id="status"></div>
-
-  </div>
+<div id="status"></div>
 </section>
 
-<section class="panel" id="paket">
-  <h2>💜 Pilihan Paket</h2>
+<section class="panel">
+<h3>💜 Pilihan Paket</h3>
 
-  <div class="price-grid">
+<div class="grid" id="packages">
 
-    <div class="price-card">
-      <h3>Basic</h3>
-      <div class="price">Rp15.000</div>
-      <p>Video animasi 10 detik.</p>
-      <p>Prompt manual.</p>
-      <p>Template prompt gratis.</p>
-    </div>
+<button type="button" class="choice active" data-package="Basic" data-price="15000">
+Basic
+<strong>Rp15.000</strong>
+<span class="note">Paket dasar animasi</span>
+</button>
 
-    <div class="price-card popular">
-      <h3>Basic + AI</h3>
-      <div class="price">Rp20.000</div>
-      <p>Video animasi 10 detik.</p>
-      <p>Prompt manual.</p>
-      <p>Bantuan AI membuat prompt.</p>
-    </div>
+<button type="button" class="choice" data-package="Basic + AI" data-price="20000">
+Basic + AI
+<strong>Rp20.000</strong>
+<span class="note">Kreasi dengan AI</span>
+</button>
 
-    <div class="price-card">
-      <h3>Premium</h3>
-      <div class="price">Rp25.000</div>
-      <p>Video animasi 10 detik.</p>
-      <p>AI Prompt Assistant.</p>
-      <p>Arahan gerakan dan kamera lebih detail.</p>
-    </div>
+<button type="button" class="choice" data-package="Premium" data-price="25000">
+Premium
+<strong>Rp25.000</strong>
+<span class="note">Paket kualitas premium</span>
+</button>
 
-  </div>
+</div>
 
-  <p class="note">
-    Harga di atas masih simulasi dan dapat disesuaikan.
-    Biaya tambahan akan diinformasikan sebelum pemesanan.
-  </p>
+<p class="note">
+Pilih paket yang sesuai kebutuhanmu. Harga di atas merupakan harga awal.
+</p>
+</section>
+
+<section class="panel" id="orderPanel">
+<h3>📋 Data Pemesan</h3>
+
+<div class="small-title">NAMA</div>
+<input id="customer" placeholder="Masukkan nama kamu">
+
+<div class="small-title">WHATSAPP</div>
+<input id="phone" type="tel" placeholder="Nomor WhatsApp">
+
+<p class="note">
+Pastikan data sudah benar sebelum mengirim pesanan.
+</p>
+
+<button class="primary" id="submitBtn" type="button">
+Kirim Pesanan
+</button>
+
+<div id="orderStatus"></div>
 </section>
 
 </main>
 
 <footer>
-  <p>✦ AI Animation Studio</p>
-  <p>Buat Fotomu Menjadi Gerak.</p>
-  <p style="margin-top:8px">© 2026 AI Animation Studio</p>
+AI Animation Studio<br>
+© 2026 All Rights Reserved
 </footer>
 
 <script>
-let selectedStyle="Clay Animation";
+// ======================================
+// KONFIGURASI SUPABASE
+// Masukkan URL dan Publishable Key milikmu
+// ======================================
 
-document.querySelectorAll(".style").forEach(item=>{
-  item.addEventListener("click",()=>{
-    document.querySelectorAll(".style").forEach(x=>{
-      x.classList.remove("active");
-    });
+const SUPABASE_URL = "MASUKKAN_PROJECT_URL";
+const SUPABASE_KEY = "MASUKKAN_PUBLISHABLE_KEY";
 
-    item.classList.add("active");
-    selectedStyle=item.dataset.style;
-  });
-});
+let db = null;
 
-document.getElementById("image").addEventListener("change",event=>{
-  const file=event.target.files[0];
-
-  if(!file)return;
-
-  if(file.size>10*1024*1024){
-    alert("Ukuran foto maksimal 10 MB.");
-    event.target.value="";
-    return;
-  }
-
-  const preview=document.getElementById("preview");
-  preview.src=URL.createObjectURL(file);
-  preview.style.display="block";
-});
-
-function makeTemplate(){
-  const text=
-  "Animasikan foto ini dengan gaya "+selectedStyle+
-  ". Pertahankan wajah, identitas, pakaian, dan ciri khas karakter. "+
-  "Buat gerakan tubuh yang alami, ekspresi wajah yang hidup, "+
-  "gerakan kamera sinematik, dan animasi yang halus. "+
-  "Durasi 10 detik. No dialogue, no voice-over, no subtitles, no text on screen.";
-
-  document.getElementById("prompt").value=text;
-}
-
-function aiAssistant(){
-  alert(
-    "Asisten Prompt AI akan segera hadir. "+
-    "Fitur ini memerlukan integrasi API AI dan akan tersedia sesuai paket layanan."
+if(
+  window.supabase &&
+  SUPABASE_URL.startsWith("https://") &&
+  SUPABASE_KEY.startsWith("sb_publishable_")
+){
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
   );
 }
 
-function submitOrder(){
-  const file=document.getElementById("image").files[0];
-  const prompt=document.getElementById("prompt").value.trim();
+// ======================================
+// PILIHAN ANIMASI DAN PAKET
+// ======================================
+
+let selectedStyle = "Clay Animation";
+let selectedPackage = "Basic";
+let selectedPrice = 15000;
+
+document.querySelectorAll("#styles .choice").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#styles .choice")
+      .forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedStyle = btn.dataset.value;
+  });
+});
+
+document.querySelectorAll("#packages .choice").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll("#packages .choice")
+      .forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedPackage = btn.dataset.package;
+    selectedPrice = Number(btn.dataset.price);
+  });
+});
+
+// ======================================
+// PREVIEW FOTO
+// ======================================
+
+const imageInput = document.getElementById("image");
+const preview = document.getElementById("preview");
+
+imageInput.addEventListener("change",()=>{
+  const file = imageInput.files[0];
+
+  if(!file) return;
+
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type)){
+    alert("Gunakan foto JPG, PNG atau WEBP.");
+    imageInput.value = "";
+    return;
+  }
+
+  if(file.size > 5 * 1024 * 1024){
+    alert("Ukuran foto maksimal 5 MB.");
+    imageInput.value = "";
+    return;
+  }
+
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+});
+
+// ======================================
+// LANJUT PEMESANAN
+// ======================================
+
+document.getElementById("continueBtn").addEventListener("click",()=>{
+  const file = imageInput.files[0];
+  const prompt = document.getElementById("prompt").value.trim();
 
   if(!file){
     alert("Silakan unggah foto terlebih dahulu.");
@@ -481,18 +301,117 @@ function submitOrder(){
   }
 
   if(!prompt){
-    alert("Silakan isi instruksi gerakan terlebih dahulu.");
+    alert("Silakan isi instruksi gerakan.");
     return;
   }
 
-  document.getElementById("status").textContent=
-    "Berhasil! Foto dan instruksi sudah siap. "+
-    "Sistem pemesanan dan produksi video akan dihubungkan pada tahap berikutnya.";
-
-  document.getElementById("status").scrollIntoView({
-    behavior:"smooth",
-    block:"center"
+  document.getElementById("orderPanel").scrollIntoView({
+    behavior:"smooth"
   });
+});
+
+// ======================================
+// KIRIM PESANAN KE SUPABASE
+// Memerlukan tabel orders dan bucket
+// order-photos yang sudah disiapkan.
+// ======================================
+
+document.getElementById("submitBtn").addEventListener("click",submitOrder);
+
+async function submitOrder(){
+
+  const file = imageInput.files[0];
+  const prompt = document.getElementById("prompt").value.trim();
+  const customer = document.getElementById("customer").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const status = document.getElementById("orderStatus");
+  const submitBtn = document.getElementById("submitBtn");
+
+  if(!file){
+    alert("Silakan unggah foto.");
+    return;
+  }
+
+  if(!prompt){
+    alert("Silakan isi instruksi gerakan.");
+    return;
+  }
+
+  if(!customer || !phone){
+    alert("Silakan isi nama dan nomor WhatsApp.");
+    return;
+  }
+
+  if(!db){
+    status.style.display = "block";
+    status.textContent = "Koneksi Supabase belum dikonfigurasi. Periksa URL dan Publishable Key.";
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Mengirim pesanan...";
+
+  status.style.display = "block";
+  status.textContent = "Sedang mengunggah foto...";
+
+  try{
+
+    const extension = file.name.split(".").pop().toLowerCase();
+    const safeExtension = ["jpg","jpeg","png","webp"].includes(extension)
+      ? extension : "jpg";
+
+    const filePath = crypto.randomUUID() + "." + safeExtension;
+
+    const {data:uploadData,error:uploadError} =
+      await db.storage
+      .from("order-photos")
+      .upload(filePath,file,{
+        contentType:file.type,
+        upsert:false
+      });
+
+    if(uploadError) throw uploadError;
+
+    const {data:publicData} =
+      db.storage.from("order-photos").getPublicUrl(filePath);
+
+    status.textContent = "Foto berhasil diunggah. Menyimpan pesanan...";
+
+    const {error:insertError} = await db
+      .from("orders")
+      .insert({
+        customer_name:customer,
+        phone:phone,
+        image_url:publicData.publicUrl,
+        image_path:filePath,
+        animation_style:selectedStyle,
+        movement_prompt:prompt,
+        duration:document.getElementById("duration").value,
+        video_format:document.getElementById("format").value,
+        package_name:selectedPackage,
+        price:selectedPrice,
+        status:"pending"
+      });
+
+    if(insertError) throw insertError;
+
+    status.textContent =
+      "Pesanan berhasil disimpan! Tim AI Animation Studio akan menindaklanjuti pesananmu.";
+
+    submitBtn.textContent = "Pesanan Terkirim";
+
+  }catch(error){
+
+    console.error(error);
+
+    status.textContent =
+      "Pesanan belum berhasil disimpan: " +
+      (error.message || "Terjadi kesalahan.");
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Coba Kirim Lagi";
+
+  }
 }
 </script>
 
